@@ -174,25 +174,6 @@ sensor:
     output_power:
       name: "${name} output power"
 
-  - platform: copy
-    id: ac_power
-    source_id: dc_power
-    name: "${name} ac power (~ calculated)"
-    accuracy_decimals: 0
-    filters:
-      - calibrate_linear:
-      - 0.1 -> 0
-      - 31 -> 24
-      - 113 -> 96
-      - 247 -> 226
-
-# tasmota & Shelly 3em
-http_request:
-  id: http_request0
-  useragent: esphome/device
-  timeout: 1000ms
-
-sensor:
   - platform: template
     id: powermeter0
     name: "Instantaneous Power"
@@ -200,6 +181,27 @@ sensor:
     device_class: "power"
     accuracy_decimals: 2
     update_interval: never
+
+  - platform: copy
+    id: ac_power
+    source_id: dc_power
+    name: "${name} ac power (~ calculated)"
+    accuracy_decimals: 0
+    filters:
+      - calibrate_linear:
+         method: least_squares
+         datapoints:
+          # Map 0.0 (from sensor) to 1.0 (true value)
+          - 0.1 -> 0
+          - 31 -> 24
+          - 113 -> 96
+          - 247 -> 226
+
+# tasmota & Shelly 3em
+http_request:
+  id: http_request0
+  useragent: esphome/device
+  timeout: 1000ms
 
 interval:
   - interval: 1100ms
