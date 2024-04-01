@@ -52,7 +52,7 @@ soyosource_modbus:
     #
     # The name is used as prefix for some log messages and should
     # help to distinguish between different instances/devices
-    name: L1
+    name: l1
 
 soyosource_virtual_meter:
   - id: virtualmeter0
