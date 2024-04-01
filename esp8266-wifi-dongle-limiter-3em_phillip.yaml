@@ -1,5 +1,5 @@
 substitutions:
-  name: soyosource-dongle-limiter
+  name: L1
   device_description: "Monitor and control the Soyosource using the OEM WiFi dongle"
   external_components_source: github://syssi/esphome-soyosource-gtn-virtual-meter@main
   tx_pin_rs485: GPIO5
@@ -89,50 +89,54 @@ soyosource_display:
 binary_sensor:
   - platform: soyosource_display
     fan_running:
-      name: "fan running"
+      name: "${name} fan running"
     limiter_connected:
-      name: "limiter connected"
+      name: "${name} limiter connected"
 
 button:
   - platform: soyosource_display
     restart:
-      name: "restart"
+      name: "${name} restart"
 
 number:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     buffer:
-      name: "buffer"
+      name: "${name} buffer"
       initial_value: 10
       restore_value: true
+      mode: box
     manual_power_demand:
-      name: "manual power demand"
+      name: "${name} manual power demand"
       max_value: 900
+      mode: box
     max_power_demand:
-      name: "max power demand"
+      name: "${name}max power demand"
       initial_value: 600
       max_value: 900
       restore_value: true
+      mode: box
     power_demand_divider:
-      name: "power demand divider"
+      name: "${name} power demand divider"
       initial_value: 1
       restore_value: true
+      mode: box
 
   - platform: soyosource_display
     start_voltage:
-      name: "start voltage"
+      name: "${name} start voltage"
     shutdown_voltage:
-      name: "shutdown voltage"
+      name: "${name} shutdown voltage"
     # Maximum output power in limiter mode / Output power in constant power mode
     output_power_limit:
-      name: "output power limit"
+      name: "${name} output power limit"
     start_delay:
-      name: "start delay"
+      name: "${name} start delay"
 
 select:
   - platform: soyosource_display
     operation_mode:
-      name: "operation mode"
+      name: "${name} operation mode"
       optionsmap:
         1: "PV"
         2: "Battery Constant Power"
@@ -143,56 +147,56 @@ sensor:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     power_demand:
-      name: "power demand"
+      name: "${name} power demand"
 
   - platform: soyosource_display
     error_bitmask:
-      name: "error bitmask"
+      name: "${name} error bitmask"
     operation_mode_id:
-      name: "operation mode id"
+      name: "${name} operation mode id"
     operation_status_id:
-      name: "operation status id"
+      name: "${name} operation status id"
       id: operation_status_id0
     battery_voltage:
-      name: "battery voltage"
+      name: "${name} battery voltage"
     battery_current:
-      name: "battery current"
+      name: "${name} battery current"
     battery_power:
-      name: "battery power"
+      name: "${name} battery power"
       id: dc_power
     ac_voltage:
-      name: "ac voltage"
+      name: "${name} ac voltage"
     ac_frequency:
-      name: "ac frequency"
+      name: "${name} ac frequency"
     temperature:
-      name: "temperature"
+      name: "${name} temperature"
     total_energy:
-      name: "total energy"
+      name: "${name} total energy"
     output_power:
-      name: "output power"
+      name: "${name} output power"
 
   - platform: template
     id: powermeter0
-    name: "Instantaneous Power"
+    name: "${name} Instantaneous Power"
     unit_of_measurement: W
     device_class: "power"
     accuracy_decimals: 2
     update_interval: never
 
-  - platform: copy
-    id: ac_power
-    source_id: dc_power
-    name: "ac power (~ calculated)"
-    accuracy_decimals: 0
-    filters:
-      - calibrate_linear:
-         method: least_squares
-         datapoints:
-          # Map 0.0 (from sensor) to 1.0 (true value)
-          - 0.1 -> 0
-          - 31 -> 24
-          - 113 -> 96
-          - 247 -> 226
+#  - platform: copy
+#    id: ac_power
+#    source_id: dc_power
+#    name: "${name} ac power (~ calculated)"
+#    accuracy_decimals: 0
+#    filters:
+#      - calibrate_linear:
+#         method: least_squares
+#         datapoints:
+#          # Map 0.0 (from sensor) to 1.0 (true value)
+#          - 0.1 -> 0
+#          - 31 -> 24
+#          - 113 -> 96
+#          - 247 -> 226
 
 # tasmota & Shelly 3em
 http_request:
@@ -224,22 +228,22 @@ switch:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     manual_mode:
-      name: "manual mode"
+      name: "${name} manual mode"
       restore_mode: RESTORE_DEFAULT_ON
     emergency_power_off:
-      name: "emergency power off"
+      name: "${name} emergency power off"
       restore_mode: RESTORE_DEFAULT_OFF
 
 text_sensor:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     operation_mode:
-      name: "limiter operation mode"
+      name: "${name} limiter operation mode"
 
   - platform: soyosource_display
     errors:
-      name: "errors"
+      name: "${name} errors"
     operation_mode:
-      name: "operation mode"
+      name: "${name} operation mode"
     operation_status:
-      name: "operation status"
+      name: "${name} operation status"
