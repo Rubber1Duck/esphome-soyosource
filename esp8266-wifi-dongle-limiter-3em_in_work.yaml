@@ -1,10 +1,10 @@
 substitutions:
-  name: soyosource-dongle-limit
+  name: soyosource-dongle-limiter
   device_description: "Monitor and control the Soyosource using the OEM WiFi dongle and control the power output on demand via 3em and displayport RS485"
   external_components_source: github://syssi/esphome-soyosource-gtn-virtual-meter@main
   tx_pin_rs485: GPIO5
   rx_pin_rs485: GPIO14
-  shelly_3em_url: "http://192.168.178.5/status/"
+  shelly_3em_url: "http://192.168.178.45/status/"
   tasmota_status_url: "http://192.168.178.68/cm?user=admin&password=hb9070&cmnd=status+10"
 
 esphome:
@@ -15,7 +15,7 @@ esphome:
     version: 2.1.0
 
 esp8266:
-  board: esp12e
+  board: d1_mini
 # for testing
 #  board: d1_mini
 
