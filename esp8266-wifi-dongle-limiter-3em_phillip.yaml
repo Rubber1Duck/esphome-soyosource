@@ -1,5 +1,5 @@
 substitutions:
-  name: L1
+  name: l1
   device_description: "Monitor and control the Soyosource using the OEM WiFi dongle"
   external_components_source: github://syssi/esphome-soyosource-gtn-virtual-meter@main
   tx_pin_rs485: GPIO5
