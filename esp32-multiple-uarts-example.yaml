@@ -12,9 +12,10 @@ substitutions:
 esphome:
   name: ${name}
   comment: ${device_description}
+  min_version: 2024.6.0
   project:
     name: "syssi.esphome-soyosource-gtn-virtual-meter"
-    version: 2.1.0
+    version: 2.2.0
 
 esp32:
   board: esp-wrover-kit
@@ -31,6 +32,7 @@ ethernet:
   phy_addr: 0
 
 ota:
+  platform: esphome
 
 logger:
   baud_rate: 0

@@ -6,9 +6,10 @@ substitutions:
 esphome:
   name: ${name}
   comment: ${device_description}
+  min_version: 2024.6.0
   project:
     name: "syssi.esphome-soyosource-gtn-virtual-meter"
-    version: 2.1.0
+    version: 2.2.0
 
 esp8266:
   board: esp12e
@@ -28,6 +29,7 @@ web_server:
   local: true
 
 ota:
+  platform: esphome
 
 logger:
   baud_rate: 0

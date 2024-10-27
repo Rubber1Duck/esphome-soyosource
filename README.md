@@ -39,7 +39,7 @@ It looks like there is no GTW (waterproof) version of the device with limiter / 
 
 ## Requirements
 
-* [ESPHome 2024.5.0 or higher](https://github.com/esphome/esphome/releases).
+* [ESPHome 2024.6.0 or higher](https://github.com/esphome/esphome/releases).
 * RS485-to-TTL module (`HW-0519` f.e.)
 * Generic ESP32 or ESP8266 board
 * Required [Soyosource inverter settings](docs/soyosource-settings.jpg "Soyosource config panel")
@@ -121,8 +121,8 @@ logger:
 
 uart:
   baud_rate: 4800
-  tx_pin: GPIO1
-  rx_pin: GPIO3
+  tx_pin: ${tx_pin}
+  rx_pin: ${rx_pin}
   debug:
     direction: BOTH
 ```
