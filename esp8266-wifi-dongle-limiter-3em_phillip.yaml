@@ -11,7 +11,7 @@ esphome:
   comment: ${device_description}
   project:
     name: "syssi.esphome-soyosource-gtn-virtual-meter"
-    version: 2.1.0
+    version: 2.2.0
 
 esp8266:
   board: d1_mini
@@ -35,10 +35,11 @@ web_server:
   local: true
 
 ota:
+  platform: esphome
 
 logger:
   baud_rate: 0
-  level: DEBUG
+  level: INFO
 
 uart:
   - id: uart_0
@@ -96,54 +97,66 @@ soyosource_display:
 binary_sensor:
   - platform: soyosource_display
     fan_running:
-      name: "${name} fan running"
+      # 01 fan running
+      name: "17 fan running"
     limiter_connected:
-      name: "${name} limiter connected"
+      # 02 limiter connected
+      name: "18 limiter connected"
 
 button:
   - platform: soyosource_display
     restart:
-      name: "${name} restart"
+      # 03 restart
+      name: "28 restart"
 
 number:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     buffer:
-      name: "${name} buffer"
+      # 04 buffer
+      name: "12 buffer"
       initial_value: 10
       restore_value: true
       mode: box
     manual_power_demand:
-      name: "${name} manual power demand"
+      # 05 manual power demand
+      name: "21 manual power demand"
       max_value: 900
       mode: box
     max_power_demand:
-      name: "${name}max power demand"
-      initial_value: 600
+      # 06 max power demand
+      name: "14 max power demand"
+      initial_value: 900
       max_value: 900
       restore_value: true
       mode: box
     power_demand_divider:
-      name: "${name} power demand divider"
+      # 07 power demand divider
+      name: "27 power demand divider"
       initial_value: 1
       restore_value: true
       mode: box
 
   - platform: soyosource_display
     start_voltage:
-      name: "${name} start voltage"
+      # 08 start voltage
+      name: "31 start voltage"
     shutdown_voltage:
-      name: "${name} shutdown voltage"
+      # 09 shutdown voltage
+      name: "29 shutdown voltage"
     # Maximum output power in limiter mode / Output power in constant power mode
     output_power_limit:
-      name: "${name} output power limit"
+      # 10 output power limit
+      name: "13 output power limit"
     start_delay:
-      name: "${name} start delay"
+      # 11 start delay
+      name: "30 start delay"
 
 select:
   - platform: soyosource_display
     operation_mode:
-      name: "${name} operation mode"
+      # 12 operation mode
+      name: "22 operation mode"
       optionsmap:
         1: "PV"
         2: "Battery Constant Power"
@@ -154,103 +167,105 @@ sensor:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     power_demand:
-      name: "${name} power demand"
+      # 13 power demand
+      name: "03 power demand"
 
   - platform: soyosource_display
     error_bitmask:
-      name: "${name} error bitmask"
+      # 14 error bitmask
+      name: "16 error bitmask"
     operation_mode_id:
-      name: "${name} operation mode id"
+      # 15 operation mode id
+      name: "24 operation mode id"
     operation_status_id:
-      name: "${name} operation status id"
+      # 16 operation status id
+      name: "26 operation status id"
       id: operation_status_id0
     battery_voltage:
-      name: "${name} battery voltage"
+      # 17 battery voltage
+      name: "07 battery voltage"
     battery_current:
-      name: "${name} battery current"
+      # 18 battery current
+      name: "06 battery current"
     battery_power:
-      name: "${name} battery power"
-      id: dc_power
+      # 19 battery power
+      name: "01 battery power"
     ac_voltage:
-      name: "${name} ac voltage"
+      # 20 ac voltage
+      name: "11 AC voltage"
     ac_frequency:
-      name: "${name} ac frequency"
+      # 21 ac frequency
+      name: "10 AC frequency"
     temperature:
-      name: "${name} temperature"
+      # 22 temperature
+      name: "05 temperature"
     total_energy:
-      name: "${name} total energy"
+      # 23 total energy
+      name: "09 total energy"
     output_power:
-      name: "${name} output power"
+      # 24 output power
+      name: "02 output power"
 
   - platform: template
     id: powermeter0
-    name: "${name} Instantaneous Power"
+    # 25 Instantaneous Power
+    name: "04 Instantaneous Power"
     unit_of_measurement: W
     device_class: "power"
     accuracy_decimals: 2
     update_interval: never
-
-  - platform: copy
-    id: ac_power
-    source_id: dc_power
-    name: "${name} ac power (~ calculated)"
-    accuracy_decimals: 0
-    filters:
-      - calibrate_linear:
-         method: least_squares
-         datapoints:
-          # Map 0.0 (from sensor) to 1.0 (true value)
-          - 0.1 -> 0
-          - 31 -> 24
-          - 113 -> 96
-          - 247 -> 226
 
 # tasmota & Shelly 3em
 http_request:
   id: http_request0
   useragent: esphome/device
   timeout: 1000ms
+  esp8266_disable_ssl_support: true
 
 interval:
   - interval: 1100ms
     then:
       - http_request.get:
-          # shelly 3em
           url: ${shelly_3em_url}
           headers:
             Content-Type: application/json
-          verify_ssl: false
+          capture_response: true
+          max_response_buffer_size: 2000
           on_response:
             then:
-              # shelly 3em
               - lambda: |-
-                  std::string response_data = id(http_request0).get_string();
-                  if(!response_data.empty()) {
-                    json::parse_json(response_data, [](JsonObject root) {
-                      id(powermeter0).publish_state(root["total_power"]);
-                    });
-                  }
+                  json::parse_json(body, [](JsonObject root) -> bool {
+                    id(powermeter0).publish_state(root["total_power"]);
+                    return true;
+                  });
+
 
 switch:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     manual_mode:
-      name: "${name} manual mode"
-      restore_mode: RESTORE_DEFAULT_ON
+      # 26 manual mode
+      name: "20 manual mode"
+      restore_mode: RESTORE_DEFAULT_OFF
     emergency_power_off:
-      name: "${name} emergency power off"
+      # 27 ermergency power off
+      name: "15 emergency power off"
       restore_mode: RESTORE_DEFAULT_OFF
 
 text_sensor:
   - platform: soyosource_virtual_meter
     soyosource_virtual_meter_id: virtualmeter0
     operation_mode:
-      name: "${name} limiter operation mode"
+      # 28 limiter operation mode
+      name: "19 limiter operation mode"
 
   - platform: soyosource_display
     errors:
-      name: "${name} errors"
+      # 29 errors
+      name: "08 errors"
     operation_mode:
-      name: "${name} operation mode"
+      # 30 operation mode
+      name: "23 operation mode"
     operation_status:
-      name: "${name} operation status"
+      # 31 opertion status
+      name: "25 operation status"
